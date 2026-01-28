@@ -5,20 +5,26 @@ import nodemailer from 'nodemailer';
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
-    const { nombre, email, telefono, fecha, mensaje } = data;
+    const { tipo, fecha, hora, nombre, telefono, email, notas } = data;
 
-    if (!nombre || !email || !telefono || !fecha) {
+    // Validación básica
+    if (!tipo || !fecha || !hora || !nombre || !telefono || !email) {
       return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
+    }
+    if (!(tipo === 'visita' || tipo === 'domicilio')) {
+      return NextResponse.json({ error: 'Tipo de cita inválido' }, { status: 400 });
     }
 
     // Guarda la cita en sqlite
     const cita = await prisma.cita.create({
       data: {
-        nombre,
-        email,
-        telefono,
+        tipo,
         fecha: new Date(fecha),
-        mensaje,
+        hora,
+        nombre,
+        telefono,
+        email,
+        notas,
       },
     });
 
@@ -32,20 +38,20 @@ export async function POST(req: NextRequest) {
             pass: process.env.EMAIL_PASS,
           },
         });
-
         await transporter.sendMail({
           from: `"Relotecnic" <${process.env.EMAIL_USER}>`,
           to: cita.email,
           subject: "Confirmación de cita - Relotecnic",
           html: `<p>Hola ${cita.nombre},<br/>
-          Hemos recibido tu cita para el día <b>${new Date(cita.fecha).toLocaleString('es-ES')}</b>.
-          </p><p>Si quieres modificarla, responde a este correo.</p>`,
+            Hemos recibido tu solicitud de cita para el día <b>${new Date(cita.fecha).toLocaleDateString('es-ES')}</b> a las <b>${cita.hora}</b>.</p>
+            <p>Tipo de cita: <b>${cita.tipo === 'visita' ? 'Venir a visitarme' : 'Reparación a domicilio'}</b></p>
+            ${cita.notas ? `<p><b>Notas:</b><br/>${cita.notas}</p>` : ''}
+            <p>Si necesitas modificar la cita, responde a este email.</p>`
         });
       } catch (mailErr) {
         console.error('No se pudo enviar email:', mailErr);
       }
     }
-
     return NextResponse.json({ ok: true, cita }, { status: 201 });
   } catch (error) {
     console.error(error);
