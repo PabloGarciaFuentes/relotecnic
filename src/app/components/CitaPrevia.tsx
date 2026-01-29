@@ -2,34 +2,35 @@
 import { useState } from 'react';
 
 const HORARIOS = [
-  { label: '09:00 - 11:00', value: 'manana1' },
-  { label: '11:30 - 13:30', value: 'manana2' },
-  { label: '16:00 - 18:00', value: 'tarde' },
+  // { label: '09:00 - 11:00', value: 'manana1' },
+  // { label: '11:30 - 13:30', value: 'manana2' },
+  { label: 'tarde1', value: '17:30' },
+  { label: 'tarde2', value: '18:00' },
 ];
 
 const DIAS = [
   { label: '01', value: '2024-10-01' },
-  { label: '02', value: '2024-10-02' },
+  // { label: '02', value: '2024-10-02' },
   { label: '03', value: '2024-10-03' },
   { label: '05', value: '2024-10-05' },
   { label: '06', value: '2024-10-06' },
   { label: '07', value: '2024-10-07' },
   { label: '08', value: '2024-10-08' },
-  { label: '09', value: '2024-10-09' },
+  // { label: '09', value: '2024-10-09' },
   { label: '10', value: '2024-10-10' },
 ]; // Puedes hacer esto dinámico según la lógica avanzada deseada
 
 export default function CitaPrevia() {
   const [status, setStatus] = useState<string | null>(null);
   const [dia, setDia] = useState<string>('2024-10-05');
-  const [horario, setHorario] = useState<string>('manana2');
-  const [tipo, setTipo] = useState<string>('visita');
+  const [horario, setHorario] = useState<string>('17:30');
+  const [tipo, setTipo] = useState<string>('taller');
   const [nombre, setNombre] = useState('');
   const [telefono, setTelefono] = useState('');
   const [email, setEmail] = useState('');
   const [notas, setNotas] = useState('');
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = { tipo, fecha: dia, hora: horario, nombre, telefono, email, notas };
     const res = await fetch('/api/cita', {
@@ -42,8 +43,8 @@ export default function CitaPrevia() {
     if (res.ok) {
       // Reset form
       setDia('2024-10-05');
-      setHorario('manana2');
-      setTipo('visita');
+      setHorario('17:30');
+      setTipo('taller');
       setNombre('');
       setTelefono('');
       setEmail('');
@@ -52,7 +53,7 @@ export default function CitaPrevia() {
   }
 
   return (
-    <section id="contacto" className="py-32 px-6 bg-background-dark">
+    <section id="cita-previa" className="py-32 px-6 bg-background-dark">
       <div className="max-w-6xl mx-auto">
         <div className="glass-effect overflow-hidden gold-stroke flex flex-col lg:flex-row">
           <div className="lg:w-2/5 p-10 md:p-16 bg-primary/5 border-b lg:border-b-0 lg:border-r border-primary/10 flex flex-col justify-between">
@@ -65,7 +66,7 @@ export default function CitaPrevia() {
                 <span className="material-symbols-outlined text-primary text-3xl">location_on</span>
                 <div>
                   <p className="text-white font-bold tracking-widest uppercase text-xs mb-1">Ubicación</p>
-                  <p className="text-slate-500">Calle de la Precisión 42, Madrid</p>
+                  <p className="text-slate-500">Calle Santo Domingo 12, Cádiz</p>
                 </div>
               </div>
               <div className="flex items-start gap-6">
@@ -117,10 +118,10 @@ export default function CitaPrevia() {
                       <button type="button" key={h.value} onClick={() => setHorario(h.value)}
                         className={
                           'py-3 px-5 border border-primary/20 text-xs font-bold tracking-widest text-left flex justify-between items-center ' +
-                          (horario === h.value ? 'bg-primary text-background-dark' : 'text-white/60 hover:border-primary transition-all')
+                          (horario === h.value ? 'bg-primary text-background-dark' : 'text-white/60 hover:border-primary hover:cursor-pointer transition-all')
                         }
                       >
-                        {h.label}
+                        {h.value}
                         <span className="material-symbols-outlined text-[16px]">
                           {horario === h.value ? 'check_circle' : 'schedule'}
                         </span>
@@ -128,48 +129,52 @@ export default function CitaPrevia() {
                     ))}
                   </div>
                 </div>
-                <div className="flex flex-col gap-4 mt-4">
-                  <div className="flex gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="tipo" value="visita" checked={tipo==='visita'}
-                        onChange={() => setTipo('visita')}
-                        className="accent-primary" required
-                      />
-                      <span className="text-xs text-white">Venir a visitarme</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="tipo" value="domicilio" checked={tipo==='domicilio'}
-                        onChange={() => setTipo('domicilio')}
-                        className="accent-primary" required
-                      />
-                      <span className="text-xs text-white">Reparación a domicilio</span>
-                    </label>
-                  </div>
-                  <input type="text" name="nombre" required autoComplete="name"
-                    className="w-full bg-transparent border-b border-primary/30 text-xs text-white py-4 px-1 focus:border-primary transition-all tracking-widest placeholder:text-slate-600 focus:ring-0"
-                    placeholder="Nombre y Apellidos"
-                    value={nombre} onChange={e => setNombre(e.target.value)}
+              </div>
+            </div>
+            <div className="grid gap-16 mb-8">
+              <div className="flex gap-4 justify-center">
+                <label className="flex items-center gap-2 cursor-pointer px-8">
+                  <input type="radio" name="tipo" value="taller" checked={tipo==='taller'}
+                    onChange={() => setTipo('taller')}
+                    className="accent-primary" required
                   />
-                  <input type="tel" name="telefono" required autoComplete="tel" pattern="[0-9\s\-\+]{9,}"
-                    className="w-full bg-transparent border-b border-primary/30 text-xs text-white py-4 px-1 focus:border-primary transition-all tracking-widest placeholder:text-slate-600 focus:ring-0"
-                    placeholder="Teléfono"
-                    value={telefono} onChange={e => setTelefono(e.target.value)}
+                  <span className="text-white">Venir al taller</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="tipo" value="domicilio" checked={tipo==='domicilio'}
+                    onChange={() => setTipo('domicilio')}
+                    className="accent-primary" required
                   />
-                  <input type="email" name="email" required autoComplete="email"
-                    className="w-full bg-transparent border-b border-primary/30 text-xs text-white py-4 px-1 focus:border-primary transition-all tracking-widest placeholder:text-slate-600 focus:ring-0"
-                    placeholder="Correo electrónico"
-                    value={email} onChange={e => setEmail(e.target.value)}
-                  />
-                  <textarea name="notas" rows={2}
-                    className="w-full bg-transparent border-b border-primary/30 text-xs text-white py-4 px-1 focus:border-primary transition-all tracking-widest placeholder:text-slate-600 focus:ring-0"
-                    placeholder="Notas (opcional)"
-                    value={notas} onChange={e => setNotas(e.target.value)}
-                  />
-                </div>
+                  <span className="text-white">Reparación a domicilio</span>
+                </label>
+              </div>
+            </div>
+            <div className="grid gap-16 mb-16">
+              <div className="flex flex-col gap-4 mt-4">
+                <input type="text" name="nombre" required autoComplete="name"
+                  className="w-full bg-transparent border-b border-primary/30 text-xs text-white py-4 px-1 focus:border-primary transition-all tracking-widest placeholder:text-slate-600 focus:ring-0"
+                  placeholder="Nombre y Apellidos"
+                  value={nombre} onChange={e => setNombre(e.target.value)}
+                />
+                <input type="tel" name="telefono" required autoComplete="tel" pattern="[0-9\s\-\+]{9,}"
+                  className="w-full bg-transparent border-b border-primary/30 text-xs text-white py-4 px-1 focus:border-primary transition-all tracking-widest placeholder:text-slate-600 focus:ring-0"
+                  placeholder="Teléfono"
+                  value={telefono} onChange={e => setTelefono(e.target.value)}
+                />
+                <input type="email" name="email" required autoComplete="email"
+                  className="w-full bg-transparent border-b border-primary/30 text-xs text-white py-4 px-1 focus:border-primary transition-all tracking-widest placeholder:text-slate-600 focus:ring-0"
+                  placeholder="Correo electrónico"
+                  value={email} onChange={e => setEmail(e.target.value)}
+                />
+                <textarea name="notas" rows={2}
+                  className="w-full bg-transparent border-b border-primary/30 text-xs text-white py-4 px-1 focus:border-primary transition-all tracking-widest placeholder:text-slate-600 focus:ring-0"
+                  placeholder="Notas (opcional)"
+                  value={notas} onChange={e => setNotas(e.target.value)}
+                />
               </div>
             </div>
             <div className="mt-auto">
-              <button type="submit" className="w-full bg-transparent border border-primary text-primary py-5 font-bold hover:bg-primary hover:text-background-dark transition-all uppercase tracking-[0.3em] text-xs">
+              <button type="submit" className="w-full bg-transparent border border-primary text-primary py-5 font-bold hover:bg-primary hover:text-background-dark hover:cursor-pointer transition-all uppercase tracking-[0.3em] text-xs">
                 Confirmar Reserva
               </button>
               {status && (<p className="mt-4 text-center text-sm text-primary">{status}</p>)}
